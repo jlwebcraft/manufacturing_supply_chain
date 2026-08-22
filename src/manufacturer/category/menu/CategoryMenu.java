@@ -12,11 +12,8 @@ public class CategoryMenu {
     private final CategoryService categoryService = new CategoryService();
     private final Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) {
-        new CategoryMenu().start();
-    }
-
-    public void start() {
+    /** Displays Category Management when called by ManufacturerMenu. */
+    public void showMenu() {
         boolean running = true;
         while (running) {
             printMenu();

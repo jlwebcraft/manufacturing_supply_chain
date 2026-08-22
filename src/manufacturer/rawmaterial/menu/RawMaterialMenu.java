@@ -12,11 +12,8 @@ public class RawMaterialMenu {
     private final RawMaterialService rawMaterialService = new RawMaterialService();
     private final Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) {
-        new RawMaterialMenu().start();
-    }
-
-    public void start() {
+    /** Displays Raw Material Management and obtains the manufacturer context. */
+    public void showMenu() {
         int manufacturerId;
         try {
             manufacturerId = readPositiveInt("Logged-in Manufacturer ID");
@@ -28,11 +25,11 @@ public class RawMaterialMenu {
             System.out.println("Database error: " + exception.getMessage());
             return;
         }
-        start(manufacturerId);
+        showMenu(manufacturerId);
     }
 
     /** Allows the shared login/menu module to provide the logged-in manufacturer ID. */
-    public void start(int manufacturerId) {
+    public void showMenu(int manufacturerId) {
         boolean running = true;
         while (running) {
             printMenu();

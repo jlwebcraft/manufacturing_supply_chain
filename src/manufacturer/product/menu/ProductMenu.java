@@ -13,11 +13,8 @@ public class ProductMenu {
     private final ProductService productService = new ProductService();
     private final Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) {
-        new ProductMenu().start();
-    }
-
-    public void start() {
+    /** Displays Product Management when called by ManufacturerMenu. */
+    public void showMenu() {
         boolean running = true;
         while (running) {
             printMenu();
