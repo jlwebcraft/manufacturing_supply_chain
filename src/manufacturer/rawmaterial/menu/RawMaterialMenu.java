@@ -43,7 +43,7 @@ public class RawMaterialMenu {
                     case "6": deactivateRawMaterial(manufacturerId); break;
                     case "7": activateRawMaterial(manufacturerId); break;
                     case "0": running = false; break;
-                    default: System.out.println("Invalid choice. Please choose 1 to 8.");
+                    default: System.out.println("Invalid choice. Please choose 0 to 7");
                 }
             } catch (IllegalArgumentException exception) {
                 System.out.println("Input error: " + exception.getMessage());

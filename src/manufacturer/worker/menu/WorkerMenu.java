@@ -34,7 +34,7 @@ public class WorkerMenu {
                     case "4": updateWorker(manufacturerId); break;
                     case "5": changeWorkerStatus(manufacturerId); break;
                     case "0": running = false; break;
-                    default: System.out.println("Invalid choice. Please choose 1 to 6.");
+                    default: System.out.println("Invalid choice. Please choose 0 to 5.");
                 }
             } catch (IllegalArgumentException exception) {
                 System.out.println("Input error: " + exception.getMessage());
