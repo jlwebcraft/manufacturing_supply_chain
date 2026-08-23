@@ -12,6 +12,17 @@ import java.util.Scanner;
 public class ProductMenu {
     private final ProductService productService = new ProductService();
     private final Scanner scanner = new Scanner(System.in);
+    private int loggedInManufacturerId;
+
+    /** Uses the logged-in manufacturer context when called from ManufacturerMenu. */
+    public void showMenu(int manufacturerId) {
+        if (manufacturerId <= 0) {
+            throw new IllegalArgumentException("Manufacturer ID must be a positive number.");
+        }
+        loggedInManufacturerId = manufacturerId;
+        showMenu();
+        loggedInManufacturerId = 0;
+    }
 
     /** Displays Product Management when called by ManufacturerMenu. */
     public void showMenu() {
@@ -56,6 +67,7 @@ public class ProductMenu {
             System.out.println("Product ID not found.");
             return;
         }
+        ensureProductBelongsToManufacturer(product);
         System.out.println("\n--- Product Details ---");
         System.out.println("Product ID: " + product.getProductId());
         System.out.println("Manufacturer ID: " + product.getManufacturerId());
@@ -76,7 +88,7 @@ public class ProductMenu {
 
     private void deactivateProduct() throws SQLException {
         int productId = readPositiveInt("Product ID");
-        int manufacturerId = readPositiveInt("Manufacturer ID");
+        int manufacturerId = loggedInManufacturerId > 0 ? loggedInManufacturerId : readPositiveInt("Manufacturer ID");
         System.out.print("Deactivate this product? (Y/N): ");
         if (!"Y".equalsIgnoreCase(scanner.nextLine().trim())) {
             System.out.println("Deactivation cancelled.");
@@ -87,7 +99,7 @@ public class ProductMenu {
     }
 
     private Product readProductDetails(int productId) {
-        int manufacturerId = readPositiveInt("Manufacturer ID");
+        int manufacturerId = loggedInManufacturerId > 0 ? loggedInManufacturerId : readPositiveInt("Manufacturer ID");
         int categoryId = readPositiveInt("Category ID");
         System.out.print("Product name: ");
         String name = scanner.nextLine();
@@ -121,9 +133,18 @@ public class ProductMenu {
                 "ID", "Manufacturer ID", "Product", "Category", "Price", "Status");
         System.out.println("------------------------------------------------------------------------------------------------");
         for (Product product : products) {
+            if (loggedInManufacturerId > 0 && product.getManufacturerId() != loggedInManufacturerId) {
+                continue;
+            }
             System.out.printf("%-5d %-16d %-22s %-18s %-12s %-10s%n", product.getProductId(),
                     product.getManufacturerId(), product.getProductName(), product.getCategoryName(),
                     product.getPrice(), product.getStatus());
+        }
+    }
+
+    private void ensureProductBelongsToManufacturer(Product product) {
+        if (loggedInManufacturerId > 0 && product.getManufacturerId() != loggedInManufacturerId) {
+            throw new IllegalArgumentException("This product belongs to another manufacturer.");
         }
     }
 
