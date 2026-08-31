@@ -1,64 +1,58 @@
 package util;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import exception.DatabaseException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
-public final class DBConnection {
-    private static final String CONFIG_FILE = "config/database.properties";
+/**
+ * Single shared Database Connection Utility for the Manufacturing and Supply Chain System.
+ * Shared across Member 1, Member 2, Member 3, and Member 4.
+ */
+public class DBConnection {
+
+    private static final String URL = "jdbc:mysql://localhost:3306/manufacturing_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    private static final String USER = "root";
+    private static final String PASSWORD = "";
+
+    static {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            System.err.println("MySQL JDBC Driver not found. Ensure mysql-connector-j jar is added to classpath.");
+        }
+    }
 
     private DBConnection() {
+        // Private constructor to prevent instantiation
     }
 
-    public static Connection getConnection() throws SQLException {
-        Properties properties = loadProperties();
-        String driver = getRequiredProperty(properties, "db.driver");
-        String url = getRequiredProperty(properties, "db.url");
-        String username = getRequiredProperty(properties, "db.username");
-        String password = getRequiredProperty(properties, "db.password");
-
+    /**
+     * Obtains a connection to the MySQL database.
+     * @return Connection object
+     * @throws DatabaseException if connection fails
+     */
+    public static Connection getConnection() throws DatabaseException {
         try {
-            Class.forName(driver);
-        } catch (ClassNotFoundException exception) {
-            throw new SQLException("Database driver not found. Add the MySQL Connector/J jar to the classpath.", exception);
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to establish database connection: " + e.getMessage(), e);
         }
-
-        return DriverManager.getConnection(url, username, password);
     }
 
-    private static Properties loadProperties() throws SQLException {
-        Properties properties = new Properties();
-
-        try (InputStream fileInput = new FileInputStream(CONFIG_FILE)) {
-            properties.load(fileInput);
-            return properties;
-        } catch (IOException ignored) {
-            try (InputStream classpathInput = DBConnection.class.getClassLoader()
-                    .getResourceAsStream("database.properties")) {
-                if (classpathInput != null) {
-                    properties.load(classpathInput);
+    /**
+     * Closes the given Connection safely.
+     * @param connection Connection object to close
+     */
+    public static void closeConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                if (!connection.isClosed()) {
+                    connection.close();
                 }
-            } catch (IOException exception) {
-                throw new SQLException("Unable to read database configuration.", exception);
+            } catch (SQLException e) {
+                System.err.println("Error closing connection: " + e.getMessage());
             }
         }
-
-        if (properties.isEmpty()) {
-            throw new SQLException("Database configuration file not found: " + CONFIG_FILE);
-        }
-
-        return properties;
-    }
-
-    private static String getRequiredProperty(Properties properties, String key) throws SQLException {
-        if (!properties.containsKey(key)) {
-            throw new SQLException("Missing database configuration value: " + key);
-        }
-
-        return properties.getProperty(key);
     }
 }

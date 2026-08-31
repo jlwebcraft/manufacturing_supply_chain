@@ -1,9 +1,11 @@
-import com.mscm.supplier.SupplierMenu;
+import controller.LoginController;
+
+/**
+ * Main application entry point for Manufacturing and Supply Chain Management System.
+ */
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello World");
-        System.out.println("hello I am Mahimn Acharya . I am in Main branch ");
-        System.out.println("Jainil");
-        System.out.println("Jainil");
+        LoginController loginController = new LoginController();
+        loginController.startMenu();
     }
 }
